@@ -4,10 +4,11 @@
       v-model="drawer"
       :clipped="$vuetify.breakpoint.lgAndUp"
       app
+      v-if="logged"
     >
       <v-list dense>
         <template>
-          <v-list-item :to="{name: ''}">
+          <v-list-item :to="{name: 'Home'}">
             <v-list-item-action>
               <v-icon>home</v-icon>
             </v-list-item-action>
@@ -47,7 +48,7 @@
             </v-list-item>
           </v-list-group>
         </template>
-        <template>
+        <template v-if="isAdmin">
           <v-list-group>
             <v-list-item slot="activator">
               <v-list-item-content>
@@ -108,10 +109,12 @@
       color="teal lighten-3"
       dark
       hide-on-scroll
+      v-if="logged"
     >
       <v-toolbar-title
         style="width: 300px"
         class="ml-0 pl-3"
+        
       >
         <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
         <span class="hidden-sm-and-down">Tramites de Villa Salome</span>
@@ -155,6 +158,24 @@ export default {
     return {
       drawer: true
     }
+  },
+  computed:{
+    logged(){
+      return this.$store.state.user;
+    },
+    isAdmin(){
+      return this.$store.state.user && this.$store.state.user.role == 'admin';
+    },
+    isCobranzas(){
+  return this.$store.state.user && this.$store.state.user.role == 'cobranzas';
+    }
+
+  },
+  created(){
+    this.$store.dispatch("autoLogin")
+  },
+  methods:{
+
   }
 };
 
