@@ -1,60 +1,161 @@
 <template>
-  <v-app>
-    <v-app-bar
+  <v-app id="app">
+    <v-navigation-drawer
+      v-model="drawer"
+      :clipped="$vuetify.breakpoint.lgAndUp"
       app
-      color="primary"
-      dark
     >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
+      <v-list dense>
+        <template>
+          <v-list-item :to="{name: ''}">
+            <v-list-item-action>
+              <v-icon>home</v-icon>
+            </v-list-item-action>
+            <v-list-item-title>
+              Inicio
+            </v-list-item-title>
+          </v-list-item>
+        </template>
+        <template>
+          <v-list-group>
+            <v-list-item slot="activator">
+              <v-list-item-content>
+                <v-list-item-title>
+                  Gestión de Trámites
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item :to="{name: 'Affiliate'}">
+              <v-list-item-action>
+                <v-icon>table_chart</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>
+                  Afiliados
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item :to="{name: ''}">
+              <v-list-item-action>
+                <v-icon>table_chart</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>
+                  Préstamos
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list-group>
+        </template>
+        <template>
+          <v-list-group>
+            <v-list-item slot="activator">
+              <v-list-item-content>
+                <v-list-item-title>
+                  Accesos
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item :to="{name: ''}">
+              <v-list-item-action>
+                <v-icon>table_chart</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>
+                  Usuarios
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list-group>
+        </template>
+        <template>
+          <v-list-group>
+            <v-list-item slot="activator">
+              <v-list-item-content>
+                <v-list-item-title>
+                  Reportes
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item :to="{name: ''}">
+              <v-list-item-action>
+                <v-icon>table_chart</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>
+                  Consulta 1
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item :to="{name: ''}">
+              <v-list-item-action>
+                <v-icon>table_chart</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>
+                  Consulta 2
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list-group>
+        </template>   
+      </v-list>
+    </v-navigation-drawer>
 
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
+    <v-app-bar
+      :clipped-left="$vuetify.breakpoint.lgAndUp"
+      app
+      color="teal lighten-3"
+      dark
+      hide-on-scroll
+    >
+      <v-toolbar-title
+        style="width: 300px"
+        class="ml-0 pl-3"
       >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>open_in_new</v-icon>
+        <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+        <span class="hidden-sm-and-down">Tramites de Villa Salome</span>
+      </v-toolbar-title>      
+      <v-spacer></v-spacer>
+      <v-btn icon>
+        <v-icon>logout</v-icon>
       </v-btn>
     </v-app-bar>
-
     <v-main>
-      <HelloWorld/>
+      <v-container
+        fluid
+        fill-height
+      >
+        <v-slide-y-transition mode="out-in">
+          <router-view/>
+        </v-slide-y-transition>
+      </v-container>
     </v-main>
+    <v-footer dark
+    padless>
+      <v-layout justify-center>
+        <v-flex text-xs-center>
+          
+          <v-card flat tile color="primary" class="lighten-3 white--text text-center">
+            <v-card-text class="white--text pt-3">
+              Mutual de Servicios al Policia &#127279; 2020
+            </v-card-text>
+          </v-card>
+        </v-flex>
+      </v-layout>
+    </v-footer>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
 
 export default {
   name: 'App',
-
-  components: {
-    HelloWorld,
-  },
-
-  data: () => ({
-    //
-  }),
+  data () {
+    return {
+      drawer: true
+    }
+  }
 };
+
 </script>
