@@ -16,10 +16,13 @@
               required
             ></v-text-field>
             <v-text-field v-model="password"
-              
+              type="password"
               label="Contraseña"
               required
             ></v-text-field>
+            <v-flex class="red--text" v-if="error_login">
+              {{error_login}}
+            </v-flex>
         </v-card-text>
         <v-spacer></v-spacer>
         <v-card-actions class="px-3 pb-3">
@@ -39,7 +42,8 @@ export default {
   data (){
     return{
       user_name:'',
-      password:''
+      password:'',
+      error_login:null
     }
   },
   methods:{
@@ -52,8 +56,13 @@ export default {
             this.$store.dispatch("saveToken",data.tokenReturn)
             this.$router.push({name:"Home"})
           })
-          .catch(function(error){
-            console.log(error);
+          .catch(error => {
+            this.error_login = null;
+            if (error.response.status = 404) {
+              this.error_login = 'No existe el usuario';
+            }else{
+              this.error_login = 'Credenciales incorrectas';
+            }
           });
     }
   }

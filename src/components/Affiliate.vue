@@ -22,7 +22,7 @@
               hide-details
             ></v-text-field>
 
-            <v-dialog v-model="dialog" max-width="500px">
+            <v-dialog v-model="dialog" max-width="700px">
               <v-card>
                 <v-card-title>
                   <span class="headline">{{ formTitle }}</span>
@@ -145,8 +145,10 @@ export default {
 
     toList() {
       let me = this;
+      let header = {"token": this.$store.state.token}
+      let config = {headers: header}
       axios
-        .get("affiliate/list")
+        .get("affiliate/list", config)
         .then(function (response) {
           me.affiliates = response.data;
         })
@@ -154,6 +156,7 @@ export default {
           console.log(error);
         });
     },
+
     validate () {
       this.valid = 0;
       this.validationMessage= [];
@@ -169,11 +172,13 @@ export default {
 
     save() {
       let me = this;
+      let header = {"token": this.$store.state.token}
+      let config = {headers: header}
       if (this.validate()){
         return;
       }
       if (this.editedIndex > -1) {
-        axios.put('affiliate/update',{'_id':this._id,'name':this.name,'last_name':this.last_name,'mothers_last_name':this.mothers_last_name, 'surname_husband':this.surname_husband, 'identity_card':this.identity_card})
+        axios.put('affiliate/update',{'_id':this._id,'name':this.name,'last_name':this.last_name,'mothers_last_name':this.mothers_last_name, 'surname_husband':this.surname_husband, 'identity_card':this.identity_card}, config)
           .then(function(response){
             me.clear();
             me.close();

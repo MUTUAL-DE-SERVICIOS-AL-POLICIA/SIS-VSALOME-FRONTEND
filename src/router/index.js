@@ -4,7 +4,7 @@ import store from '../store/index'
 import Home from '../views/Home.vue'
 import Affiliate from '../components/Affiliate.vue'
 import Login from '../components/Login.vue'
-
+import Loan from '../components/Loan'
 
 Vue.use(VueRouter)
 
@@ -22,6 +22,15 @@ const routes = [
     path: '/affiliate',
     name: 'Affiliate',
     component: Affiliate,
+    meta: {
+      admin: true,
+      cobranzas: true
+    }
+  },
+  {
+    path: '/loan',
+    name: 'Loan',
+    component: Loan,
     meta: {
       admin: true,
       cobranzas: true

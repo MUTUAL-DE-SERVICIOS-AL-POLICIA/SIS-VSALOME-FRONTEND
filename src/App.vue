@@ -17,7 +17,7 @@
             </v-list-item-title>
           </v-list-item>
         </template>
-        <template>
+        <template v-if="isCobranzas">
           <v-list-group>
             <v-list-item slot="activator">
               <v-list-item-content>
@@ -36,7 +36,7 @@
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item :to="{name: ''}">
+            <v-list-item :to="{name: 'Loan'}">
               <v-list-item-action>
                 <v-icon>table_chart</v-icon>
               </v-list-item-action>
@@ -120,7 +120,7 @@
         <span class="hidden-sm-and-down">Tramites de Villa Salome</span>
       </v-toolbar-title>      
       <v-spacer></v-spacer>
-      <v-btn icon>
+      <v-btn icon @click="logout()">
         <v-icon>logout</v-icon>
       </v-btn>
     </v-app-bar>
@@ -167,15 +167,18 @@ export default {
       return this.$store.state.user && this.$store.state.user.role == 'admin';
     },
     isCobranzas(){
-  return this.$store.state.user && this.$store.state.user.role == 'cobranzas';
-    }
+      return this.$store.state.user && this.$store.state.user.role == 'cobranzas';
+    },
+
 
   },
   created(){
     this.$store.dispatch("autoLogin")
   },
   methods:{
-
+    logout(){
+      return this.$store.dispatch("logout");
+    }
   }
 };
 
