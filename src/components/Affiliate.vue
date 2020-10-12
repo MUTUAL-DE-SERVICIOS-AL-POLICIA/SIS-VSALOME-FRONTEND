@@ -7,6 +7,8 @@
         :search="search"
         sort-by="calories"
         class="elevation-1"
+        :items-per-page="100"
+        hide-default-footer
       >
         <template v-slot:top>
           <v-toolbar flat>

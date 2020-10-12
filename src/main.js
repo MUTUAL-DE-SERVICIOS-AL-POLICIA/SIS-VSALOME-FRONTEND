@@ -7,7 +7,9 @@ import vuetify from './plugins/vuetify';
 import moment from 'vue-moment';
 
 Vue.config.productionTip = false
+
 axios.defaults.baseURL='http://localhost:3000/api/'
+//axios.defaults.baseURL='https://villasalome.herokuapp.com/api/'
 
 new Vue({
   router,

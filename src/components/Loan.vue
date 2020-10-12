@@ -7,6 +7,8 @@
         :search="search"
         sort-by="calories"
         class="elevation-1"
+        :items-per-page="100"
+        hide-default-footer
         v-if="editPayments==0"
       >
         <template v-slot:top>
@@ -174,6 +176,7 @@
                             <table id="facarticulo">
                                 <thead>
                                     <tr id="fa">
+                                        <th>Nro.</th>
                                         <th>Fecha</th>
                                         <th>Monto Mensual</th>
                                         <th>Amortización</th>
@@ -188,7 +191,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="payment in payments" :key="payment._id">
+                                    <tr v-for="payment in itemsWithIndex" :key="payment._id">
+                                        <td style="text-align:center;">{{ payment.index }}</td>
                                         <td style="text-align:center;">{{ payment.date }}</td>
                                         <td style="text-align:center;">{{ payment.estimated_quota }}</td>
                                         <td style="text-align:right;">{{ payment.quota }}</td>
@@ -259,7 +263,8 @@
           <v-btn color="primary" @click="toList()"> Actualizar </v-btn>
         </template>
       </v-data-table>
-      
+
+
       <v-container grid-list-sm class="pa-4 white" v-if="editPayments">
           <v-toolbar-title>Kardex del Prestatario</v-toolbar-title>
           <v-subheader> </v-subheader>
@@ -312,16 +317,107 @@
               <v-text-field outlined readonly v-model="loan_term" label="Meses">
               </v-text-field>
           </v-flex>
-
+          <v-spacer> </v-spacer>
+          <v-btn color="primary" @click="addInt(_id)">+ Interes</v-btn>
+          <v-spacer> </v-spacer>
+          <v-btn color="primary" @click="addAccint(_id)">+ Interes Penal</v-btn>
+          
           <v-flex xs12 sm12 md12 lg12 xl12>
             <template>
                 <v-data-table
                     :headers="headersPayments"
-                    :items="payments"
+                    :items="itemsWithIndex"
+                    :items-per-page="100"
                     hide-default-footer
                     class="elevation-1"
                 >
                 <template v-slot:top>
+                  <v-dialog
+                    v-model="dialogAmort"
+                    max-width="500px"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                        color="primary"
+                        dark
+                        class="mb-2"
+                        v-bind="attrs"
+                        v-on="on"
+                      >
+                        Amortizar
+                      </v-btn>
+                    </template>
+                    <v-card>
+                      <v-card-title>
+                        <span class="headline">Amortizar</span>
+                      </v-card-title>
+
+                      <v-card-text>
+                        <v-container>
+                          <v-row>
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              md="4"
+                            >
+                              <v-text-field
+                                v-model="date"
+                                label="Fecha"
+                              ></v-text-field>
+                            </v-col>
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              md="4"
+                            >
+                              <v-text-field
+                                v-model="total"
+                                label="Monto"
+                              ></v-text-field>
+                            </v-col>
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              md="4"
+                            >
+                              <v-text-field
+                                v-model="receipt"
+                                label="Recibo"
+                              ></v-text-field>
+                            </v-col>
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              md="4"
+                            >
+                              <v-text-field
+                                v-model="registry"
+                                label="Cuota"
+                              ></v-text-field>
+                            </v-col>
+                          </v-row>
+                        </v-container>
+                      </v-card-text>
+
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                          color="blue darken-1"
+                          text
+                          @click="close"
+                        >
+                          Cancel
+                        </v-btn>
+                        <v-btn
+                          color="blue darken-1"
+                          text
+                          @click="saveAmort"
+                        >
+                          Save
+                        </v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
                 </template>
               </v-data-table>
             </template>
@@ -346,6 +442,7 @@ export default {
   data() {
     return {
       dialog: false,
+      dialogAmort: false,
       search: "",
       loans: [],
       headers: [
@@ -380,7 +477,8 @@ export default {
 
       payments: [],
       headersPayments: [
-        { text: "Fecha", value: "date" },
+        { text: "Nro.", value: "index" },
+        { text: "Fecha de transacción", value: "date" },
         { text: "Monto Mensual", value: "estimated_quota" },
         { text: "Amortización", value: "quota" },
         { text: "Otros Cobros", value: "other_charge" },
@@ -394,6 +492,11 @@ export default {
         
       ],
       
+      date:'',
+      total:'',
+      receipt:'',
+      registry:'',
+      
       editPayments:0,
       valid:0,
       validationMessage:[],
@@ -405,6 +508,14 @@ export default {
     formTitle() {
       return "Editar Trámite";
     },
+    itemsWithIndex () {
+    return this.payments.map(
+      (payments, index) => ({
+        ...payments,
+        index: index + 1,        
+      }))
+  }
+
   },
 
   watch: {
@@ -452,6 +563,11 @@ export default {
         .get('payment/list?loan_id='+id,config)
         .then(function (response){
           me.payments=response.data;
+          me.payments.map(
+          (payments, index) => ({
+            ...payments,
+            index: index + 1
+          }));
         })
         .catch(function(error){
             console.log(error);
@@ -460,7 +576,7 @@ export default {
 
     showPayments(item){
         this.clear();
-
+        this._id = item._id;
         this.affiliate_identity_card = item.affiliate.identity_card;
         this.affiliate_last_name = item.affiliate.last_name;
         this.affiliate_mothers_last_name = item.affiliate.mothers_last_name;
@@ -482,7 +598,29 @@ export default {
         this.editPayments = 0;
         this.clear();
     },
+    saveAmort() {
+      let me = this;
+      let header = {"token": this.$store.state.token}
+      let config = {headers: header}
+      if (this.validate()){
+        return;
+      }
+        axios.post('payment/add',{
+          'loan':this._id,
+          'date':this.date,
+          'total':this.total,
+          'receipt':this.receipt,
+          'registry':this.registry}, config)
+          .then(function(response){
+            me.close();
+            me.toList();
+          })
+          .catch(function(error){
+            console.log(error);
+          });
 
+      this.hideEditPayments();
+    },
     saveLoan() {
       let me = this;
       let header = {"token": this.$store.state.token}
@@ -498,8 +636,8 @@ export default {
           'request_date':this.request_date,
           'amount_requested':this.amount_requested,
           'loan_term':this.loan_term,
-          'loan_term':this.amortization,
-          'loan_term':this.interest_rate}, config)
+          'amortization':this.amortization,
+          'interest_rate':this.interest_rate}, config)
           .then(function(response){
             me.clear();
             me.close();
@@ -512,6 +650,45 @@ export default {
         //
       }
       this.close();
+    },
+    addInt(id) {
+      console.log(id)
+      let me = this;
+      let header = {"token": this.$store.state.token}
+      let config = {headers: header}
+      if (this.validate()){
+        return;
+      }
+      axios.get('loan/queryint?_id='+id,config)
+        .then(function(response){
+          me.clear();
+          me.close();
+          me.toList();
+        })
+        .catch(function(error){
+          console.log(error);
+        });
+        this.editPayments = 0;
+        this.clear();
+    },
+    addAccint(id) {
+      let me = this;
+      let header = {"token": this.$store.state.token}
+      let config = {headers: header}
+      if (this.validate()){
+        return;
+      }
+      axios.get('loan/queryaccint?_id='+id,config)
+        .then(function(response){
+          me.clear();
+          me.close();
+          me.toList();
+        })
+        .catch(function(error){
+          console.log(error);
+        });
+        this.editPayments = 0;
+        this.clear();
     },
 
     editLoan(item) {
@@ -546,6 +723,8 @@ export default {
 
     close() {
       this.dialog = false;
+      this.dialogAmort = false;
+      
     },
     
     showKardex(item){
@@ -559,7 +738,7 @@ export default {
 
         this.code = item.code;
         this.voucher = item.voucher;
-        this.request_date = item.request_date;
+        this.request_date = moment(item.request_date).format('YYYY-MM-DD');
         this.amount_requested = item.amount_requested;
         this.loan_term = item.loan_term;
         this.amortization = item.amortization;
