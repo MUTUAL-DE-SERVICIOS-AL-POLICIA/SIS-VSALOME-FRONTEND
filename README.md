@@ -14,6 +14,8 @@ npm run serve
 
 Change backend ip address and port in file main.js
 
+Change env variables.
+
 ```sh
 docker build -t sis-vsalome-frontend:v1 .
 ```
