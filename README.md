@@ -10,6 +10,18 @@ npm install
 npm run serve
 ```
 
+### Deploying with docker
+
+Change backend ip address and port in file main.js
+
+```sh
+docker build -t sis-vsalome-frontend:v1 .
+```
+
+```sh
+docker run -p 3002:80 sis-vsalome-frontend:v1
+```
+
 ### Compiles and minifies for production
 ```
 npm run build
