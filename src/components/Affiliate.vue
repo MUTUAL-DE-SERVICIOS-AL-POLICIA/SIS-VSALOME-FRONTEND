@@ -5,10 +5,8 @@
         :headers="headers"
         :items="affiliates"
         :search="search"
-        sort-by="calories"
         class="elevation-1"
-        :items-per-page="100"
-        hide-default-footer
+        :items-per-page="5"
       >
         <template v-slot:top>
           <v-toolbar flat>
@@ -111,7 +109,7 @@ export default {
         { text: "Carnet de Identidad", value: "identity_card" },
         { text: "Nombres", value: "name" },
         { text: "Apellido Paterno", value: "last_name" },
-        { text: "Apelido Materno", value: "mothers_last_name" },
+        { text: "Apellido Materno", value: "mothers_last_name" },
         { text: "Apellido de Casada", value: "surname_husband" },
         { text: "Opciones", value: "actions", sortable: false },
       ],

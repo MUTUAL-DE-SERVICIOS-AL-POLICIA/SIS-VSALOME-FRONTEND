@@ -58,7 +58,8 @@ export default {
           })
           .catch(error => {
             this.error_login = null;
-            if (error.response.status = 404) {
+            console.log(error)
+            if (error.response.status == 404) {
               this.error_login = 'No existe el usuario';
             }else{
               this.error_login = 'Credenciales incorrectas';

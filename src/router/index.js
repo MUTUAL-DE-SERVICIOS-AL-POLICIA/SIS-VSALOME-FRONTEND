@@ -5,6 +5,7 @@ import Home from '../views/Home.vue'
 import Affiliate from '../components/Affiliate.vue'
 import Login from '../components/Login.vue'
 import Loan from '../components/Loan'
+import User from '../components/User'
 
 Vue.use(VueRouter)
 
@@ -44,6 +45,14 @@ const routes = [
       free: true
     }
   },
+  {
+    path: '/user',
+    name: 'User',
+    component: User,
+    meta: {
+      admin: true
+    }
+  }
 
 ]
 
