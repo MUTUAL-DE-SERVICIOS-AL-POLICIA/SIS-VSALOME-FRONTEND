@@ -909,10 +909,35 @@
                 <template v-slot:[`item.actions`]="{ item }">
                   <v-icon @click="editPayment(item)">edit</v-icon>
                   <v-icon @click="showVoucher(item)">print</v-icon>
+                  <v-icon v-if="item.index === payments.length" @click="confirmationCancel=true; currentItem=item">delete</v-icon>
                 </template>
               </v-data-table>
             </template>
           </v-flex>
+            <v-dialog v-model="confirmationCancel" max-width="450px">
+              <v-card>
+                <v-card-title>
+                  ¿Está seguro que quiere anular el pago?
+                </v-card-title>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    color="secundary"
+                    text
+                    @click="confirmationCancel = false"
+                  >
+                    Cancelar
+                  </v-btn>
+                  <v-btn
+                    color="primary"
+                    text
+                    @click="cancelPayment(currentItem)"
+                  >
+                    Anular
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
 
           <v-btn color="primary" @click.native="hideEditPayments()"
             >Volver</v-btn
@@ -1029,6 +1054,9 @@ export default {
         precision: 2,
         masked: false,
       },
+
+      confirmationCancel: false,
+      currentItem: null
     };
   },
 
@@ -1329,7 +1357,6 @@ export default {
       this.editedIndex = 1;
       this.dialog = true;
     },
-
     clear() {
       this._id = "";
       this.code = "";
@@ -1351,15 +1378,15 @@ export default {
       this.registry = "";
       this.glosa = "";
       this.liquidate= false;
-    },
+      this.confirmationCancel=false;
 
+    },
     close() {
       this.dialog = false;
       this.dialogAmort = false;
       this.dialogAmort2 = false;
       this.liquidate= false;
     },
-
     showKardex(item) {
       this.clear();
 
@@ -1419,11 +1446,9 @@ export default {
 
       this.voucherModal = 1;
     },
-
     hideVoucher() {
       this.voucherModal = 0;
     },
-
     createPrint() {
       var quotes = document.getElementById("kardex");
       html2canvas(quotes).then(function (canvas) {
@@ -1466,6 +1491,26 @@ export default {
         doc.save("Comprobante.pdf");
       });
     },
+    cancelPayment(item){
+      let me = this.me
+      let payment_id = item._id
+      let header = { token: this.$store.state.token };
+      let config = { headers: header };
+      if (this.validate()) {
+        return;
+      }
+      axios
+        .delete("payment/remove?_id=" + payment_id, config)
+        .then(() => {
+          me.clear()
+          me.toList()
+         })
+        .catch(function (error) {
+          this.confirmationCancel = false
+          console.log(error);
+        });
+      this.editPayments = 0;
+    }
   },
 };
 
